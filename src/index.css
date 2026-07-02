@@ -1,17 +1,18 @@
+/* ১. সমস্ত @import নিয়ম সবার ওপরে থাকবে */
 @import url('https://cdn.jsdelivr.net/gh/devchauhann/fonts@v1.1.0/cdn/v1/css/all.css');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
 @import "tailwindcss";
-@font-face {
-  font-family: 'Anthropic Sans';
-  /* আপনার ফন্ট ফাইলের সঠিক পাথ (Path) এখানে দিন */
-  src: url('AnthropicSans@300.woff2') format('woff2');
-  font-weight: 100 900; /* এটি সব ধরণের ফন্ট ওয়েট সাপোর্ট করাবে */
-  font-style: normal;
-  font-display: swap;
-}
+
+/* ২. Tailwind CSS v4 থিম কনফিগারেশন */
 @theme {
-  --font-sans: "Anthropic Sans", ui-sans-serif, system-ui, sans-serif;
+  /* sans-এর জন্য গুগল ফন্ট 'Source Serif 4' সেট করা হলো */
+  --font-sans: "Source Serif 4", ui-sans-serif, system-ui, sans-serif;
+  
+  /* CDN থেকে আসা Anthropic Serif এবং Mono ফন্ট */
   --font-display: "Anthropic Serif", sans-serif;
   --font-mono: "Anthropic Mono", monospace;
+}
+
   
   --color-brand-blue: #2563eb;
   --color-brand-cyan: #06b6d4;
