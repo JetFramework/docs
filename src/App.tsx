@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -6,73 +7,47 @@ import InteractivePlayground from "./components/InteractivePlayground";
 import Benchmarks from "./components/Benchmarks";
 import Footer from "./components/Footer";
 import Docs from "./components/Docs";
-import { ArrowUpRight, Zap, Terminal, Layers, Star, Cpu, Shield, HelpCircle, Code } from "lucide-react";
+import { HelpCircle, Sparkles, Zap, Shield, Cpu } from "lucide-react";
+import { motion } from "motion/react";
 
-export default function App() {
-  const [view, setView] = useState<"home" | "docs">("home");
-  const [activeSection, setActiveSection] = useState<string>("hero");
+function HomePage() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Track scroll position to update active navbar state
+  // Scroll to hash section if present in URL
   useEffect(() => {
-    if (view !== "home") return;
-    const handleScroll = () => {
-      const sections = ["hero", "features", "sandbox", "benchmarks", "ecosystem"];
-      const scrollPosition = window.scrollY + 200;
-
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [view]);
-
-  const handleNavigate = (sectionId: string) => {
-    if (view !== "home") {
-      setView("home");
+    if (location.hash) {
+      const sectionId = location.hash.replace("#", "");
       setTimeout(() => {
         const el = document.getElementById(sectionId);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-          setActiveSection(sectionId);
-        }
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       }, 100);
-    } else {
-      const el = document.getElementById(sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setActiveSection(sectionId);
-      }
     }
+  }, [location.hash]);
+
+  const handleGetStarted = () => {
+    const el = document.getElementById("sandbox");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (view === "docs") {
-    return <Docs onBackToHome={() => setView("home")} />;
-  }
+  const handleReadDocs = () => {
+    navigate("/introduction");
+  };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-300">
-      
-      {/* Translucent Global Accent Light overlay */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[400px] radial-glow rounded-full pointer-events-none filter blur-3xl opacity-40 z-0" />
+    <div className="min-h-screen bg-[#080a0e] text-slate-100 flex flex-col selection:bg-yellow-500/30 selection:text-yellow-300 relative overflow-hidden">
+      {/* Dynamic Background Animated Glow Orbs */}
+      <div className="fixed top-[-10%] left-[15%] w-[600px] h-[600px] bg-gradient-to-br from-yellow-500/10 via-amber-500/5 to-transparent rounded-full pointer-events-none filter blur-3xl opacity-40 z-0 animate-orb-1" />
+      <div className="fixed bottom-[10%] right-[10%] w-[700px] h-[700px] bg-gradient-to-tr from-amber-500/10 via-yellow-500/5 to-transparent rounded-full pointer-events-none filter blur-3xl opacity-30 z-0 animate-orb-2" />
+      <div className="fixed top-[40%] right-[30%] w-[450px] h-[450px] bg-yellow-500/5 rounded-full pointer-events-none filter blur-3xl opacity-20 z-0 animate-pulse-subtle" />
 
       {/* Floating Header Navbar */}
-      <Navbar onNavigate={handleNavigate} activeSection={activeSection} currentView={view} onViewChange={setView} />
+      <Navbar />
 
       {/* Main content blocks */}
       <main className="flex-1 relative z-10">
-        
         {/* HERO SECTION */}
-        <Hero onGetStarted={() => handleNavigate("sandbox")} onReadDocs={() => setView("docs")} />
+        <Hero onGetStarted={handleGetStarted} onReadDocs={handleReadDocs} />
 
         {/* FEATURES SECTION WITH TABS */}
         <Features />
@@ -84,132 +59,211 @@ export default function App() {
         <Benchmarks />
 
         {/* ECOSYSTEM INTEGRATION BANNER */}
-        <section id="ecosystem" className="py-24 relative overflow-hidden bg-[#0b0f19] border-t border-slate-900">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 radial-glow-cyan rounded-full pointer-events-none filter blur-2xl opacity-20" />
+        <section id="ecosystem" className="py-24 relative overflow-hidden bg-[#080a0e] border-t border-slate-900/80">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-500/10 rounded-full pointer-events-none filter blur-3xl opacity-30" />
           
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <h2 className="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight">
-                Designed to run anywhere
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-2xl mx-auto mb-16"
+            >
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-mono mb-4">
+                <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '8s' }} />
+                <span>UNIVERSAL COMPATIBILITY</span>
+              </div>
+              <h2 className="font-display font-bold text-3xl sm:text-5xl text-white tracking-tight">
+                Designed to run <span className="bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-transparent">anywhere</span>
               </h2>
-              <p className="mt-4 text-slate-400 text-sm sm:text-base font-normal">
-                MicroJet compiles standard Python async routers. Run it seamlessly across ASGI servers, serverless containers, or production clusters.
+              <p className="mt-4 text-slate-400 text-sm sm:text-base font-normal leading-relaxed">
+                Jet compiles standard Python async routers. Run it seamlessly across ASGI servers, serverless containers, or production clusters with zero friction.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto" id="ecosystem-cards">
               
               {/* Card 1: Python 3.10+ */}
-              <div className="p-6 rounded-xl bg-slate-900/10 border border-slate-800/60 hover:border-slate-700 transition-all group flex flex-col justify-between">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="p-6 rounded-2xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group flex flex-col justify-between"
+              >
                 <div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-900/40 text-blue-400 flex items-center justify-center font-mono font-bold text-xs">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
                     Py
                   </div>
-                  <h4 className="mt-4 font-semibold text-white group-hover:text-blue-300 transition-colors">
+                  <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">
                     Python 3.10+ & PyPy
                   </h4>
-                  <p className="mt-2 text-xs text-slate-500 leading-relaxed font-normal">
+                  <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
                     Fully compatible with standard Python modules and asyncio. Runs with maximum efficiency on PyPy compilers.
                   </p>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Compatible
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span className="flex items-center gap-1.5 text-yellow-400 font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                    Compatible
+                  </span>
+                  <span className="text-slate-500 text-[10px]">v3.10+</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Card 2: ASGI */}
-              <div className="p-6 rounded-xl bg-slate-900/10 border border-slate-800/60 hover:border-slate-700 transition-all group flex flex-col justify-between">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="p-6 rounded-2xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group flex flex-col justify-between"
+              >
                 <div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-900/40 text-blue-400 flex items-center justify-center font-mono font-bold text-xs">
-                    ASGI
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="w-5 h-5 text-yellow-400" />
                   </div>
-                  <h4 className="mt-4 font-semibold text-white group-hover:text-blue-300 transition-colors">
+                  <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">
                     ASGI Engine Native
                   </h4>
-                  <p className="mt-2 text-xs text-slate-500 leading-relaxed font-normal">
-                    Achieve extreme performance gains by binding directly to standard ASGI specification servers.
+                  <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                    Achieve extreme performance gains by binding directly to standard ASGI specification servers like Uvicorn & Granian.
                   </p>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Highly Optimized
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span className="flex items-center gap-1.5 text-yellow-400 font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                    Optimized
+                  </span>
+                  <span className="text-slate-500 text-[10px]">Native</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Card 3: Cloud Run */}
-              <div className="p-6 rounded-xl bg-slate-900/10 border border-slate-800/60 hover:border-slate-700 transition-all group flex flex-col justify-between">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="p-6 rounded-2xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group flex flex-col justify-between"
+              >
                 <div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-900/40 text-blue-400 flex items-center justify-center font-mono font-bold text-xs">
-                    Cloud
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <Cpu className="w-5 h-5 text-yellow-400" />
                   </div>
-                  <h4 className="mt-4 font-semibold text-white group-hover:text-blue-300 transition-colors">
-                    Serverless & Containers
+                  <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">
+                    Serverless & Cloud
                   </h4>
-                  <p className="mt-2 text-xs text-slate-500 leading-relaxed font-normal">
-                    Sub-2ms cold-start boot ensures zero lag inside autoscaled Google Cloud Run or AWS Lambda containers.
+                  <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                    Sub-2ms cold-start boot ensures zero lag inside autoscaled Google Cloud Run, AWS Lambda, or Docker containers.
                   </p>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Compatible
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span className="flex items-center gap-1.5 text-yellow-400 font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                    Sub-2ms
+                  </span>
+                  <span className="text-slate-500 text-[10px]">Docker</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Card 4: WebSockets */}
-              <div className="p-6 rounded-xl bg-slate-900/10 border border-slate-800/60 hover:border-slate-700 transition-all group flex flex-col justify-between">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="p-6 rounded-2xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group flex flex-col justify-between"
+              >
                 <div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-900/40 text-blue-400 flex items-center justify-center font-mono font-bold text-xs">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
                     WS
                   </div>
-                  <h4 className="mt-4 font-semibold text-white group-hover:text-blue-300 transition-colors">
-                    High-Frequency Sockets
+                  <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">
+                    Real-Time Sockets
                   </h4>
-                  <p className="mt-2 text-xs text-slate-500 leading-relaxed font-normal">
-                    First-class real-time pub/sub features for web applications, live dashboards, or async telemetry APIs.
+                  <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                    First-class real-time pub/sub features for web applications, live interactive dashboards, or telemetry APIs.
                   </p>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Interactive
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span className="flex items-center gap-1.5 text-yellow-400 font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                    Interactive
+                  </span>
+                  <span className="text-slate-500 text-[10px]">Pub/Sub</span>
                 </div>
-              </div>
+              </motion.div>
 
             </div>
 
-            {/* Micro FAQ block for extra developer reassurance */}
-            <div className="mt-20 max-w-3xl mx-auto border border-slate-800 bg-[#0f1423] rounded-xl p-6 sm:p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 radial-glow rounded-full pointer-events-none filter blur-lg opacity-10" />
-              <div className="flex items-center gap-2 mb-4">
-                <HelpCircle className="w-4.5 h-4.5 text-blue-400" />
-                <h4 className="text-sm font-semibold text-white font-display uppercase tracking-wider">
-                  Developer Frequently Asked Questions
-                </h4>
+            {/* Developer FAQ block */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-20 max-w-3xl mx-auto border border-slate-800/80 bg-gradient-to-b from-[#0e1118] to-[#0a0d14] rounded-3xl p-6 sm:p-10 relative overflow-hidden shadow-2xl hover:border-slate-700/80 transition-all duration-500"
+            >
+              <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-500/10 rounded-full pointer-events-none filter blur-2xl opacity-30" />
+              <div className="absolute bottom-0 left-0 w-36 h-36 bg-amber-500/10 rounded-full pointer-events-none filter blur-2xl opacity-20" />
+              
+              <div className="flex items-center gap-3 mb-6 relative z-10">
+                <div className="p-2 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white font-display">
+                    Developer Frequently Asked Questions
+                  </h4>
+                  <p className="text-xs text-slate-400">Everything you need to know about Jet's core architecture</p>
+                </div>
               </div>
               
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div className="border-b border-slate-900/50 pb-4">
-                  <h5 className="font-semibold text-white">How does MicroJet achieve such speed?</h5>
-                  <p className="text-slate-400 font-normal mt-1 text-xs leading-relaxed">
-                    MicroJet compiles Pydantic validations directly into optimized bytecode checks. It uses a cache-aligned radix tree structure for O(k) path traversal, completely bypassing routing heap-allocation overhead typical in traditional FastAPI or Flask servers.
+              <div className="space-y-6 text-xs sm:text-sm relative z-10">
+                <div className="border-b border-slate-800/80 pb-5">
+                  <h5 className="font-semibold text-white text-sm flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                    How does Jet achieve such speed?
+                  </h5>
+                  <p className="text-slate-300 font-normal mt-2 text-xs sm:text-sm leading-relaxed pl-3.5">
+                    Jet avoids unnecessary magic and heavy wrapper layers. It routes requests directly to standard Python function handlers with zero decorator overhead, achieving lightning-fast throughput compared to traditional Python servers.
                   </p>
                 </div>
                 <div>
-                  <h5 className="font-semibold text-white">Is it fully production ready?</h5>
-                  <p className="text-slate-400 font-normal mt-1 text-xs leading-relaxed">
-                    Yes, MicroJet is fully covered with comprehensive unit and stress validation pipelines. It handles gracefully nested router boundaries, automatic multi-process cluster scaling, and ASGI payload boundaries, providing enterprise-grade reliability in production.
+                  <h5 className="font-semibold text-white text-sm flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                    Is Jet configuration-driven?
+                  </h5>
+                  <p className="text-slate-300 font-normal mt-2 text-xs sm:text-sm leading-relaxed pl-3.5">
+                    Yes, Jet follows one principle — configuration describes the application, application code describes application behavior. Keeping settings in `config.py` and logic in `app.py` keeps your codebase clean and modular.
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </section>
-
       </main>
 
       {/* Modern footer with navigation links */}
-      <Footer onNavigate={handleNavigate} />
+      <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/docs" element={<Navigate to="/introduction" replace />} />
+      <Route path="/docs/:slug" element={<Docs />} />
+      <Route path="/:slug" element={<Docs />} />
+    </Routes>
   );
 }

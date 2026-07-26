@@ -1,299 +1,383 @@
 import { useState } from "react";
-import { Zap, Shield, Cpu, Box, Check, Terminal, Layers, Sparkles } from "lucide-react";
-import { InteractiveTab, Feature } from "../types";
+import { Check, Terminal, Layers, Sparkles, BookOpen, Cpu, Shield, ArrowRight } from "lucide-react";
+import { InteractiveTab } from "../types";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Features() {
-  const [activeTab, setActiveTab] = useState<string>("routing");
+  const [activeTab, setActiveTab] = useState<string>("simple");
 
   const tabs: InteractiveTab[] = [
     {
-      id: "routing",
-      tabLabel: "Ultra-Fast Routing",
-      title: "Radix-Tree High-Speed Router",
-      subtitle: "Route matching at O(k) complexity",
-      description: "MicroJet utilizes a customized radix tree algorithm designed for minimal path-traversal overhead. Match static, parameterized, and wildcard Python routes with zero allocation in the hot path.",
+      id: "simple",
+      tabLabel: "Simple & Readable",
+      title: "No Magic, No Hidden Abstractions",
+      subtitle: "Readable by beginners, built to scale",
+      description: "Jet avoids unnecessary magic. Every API is readable by beginners while remaining powerful enough to grow — no decorator-based routing, no hidden abstractions, no invented terminology.",
       featuresList: [
-        "Parameter extraction with zero-copy substring views",
-        "Deterministic routing priority with custom filters",
-        "Nested sub-router mounts with inherited middlewares",
-        "Supports HTTP/2 and WebSockets ASGI routing out-of-the-box"
+        "Zero decorator magic or obscure magic variables",
+        "Transparent control flow you can trace in seconds",
+        "Built purely with standard Python concepts",
+        "Beginner-friendly structure with zero friction"
       ],
-      codeSnippet: `from microjet import MicroJet
-app = MicroJet()
+      codeSnippet: `from jet import *
 
-# Parameterized route matching instantly
-@app.get("/api/v1/users/{userId}/posts/{postId}")
-async def get_post(userId: str, postId: str):
-    return {"userId": userId, "postId": postId}
+app = Jet()
 
-# Wildcard routing with catch-all handlers
-@app.get("/static/{path:path}")
-async def serve_static(path: str):
-    return f"Serving asset: {path}"`
+def login(request):
+    return Response.html("<h1>Login page</h1>")
+
+app.page("/", "index.html")
+app.route("/login", login)
+
+if __name__ == "__main__":
+    serve(app)`
     },
     {
-      id: "validation",
-      tabLabel: "Type-Safe Validation",
-      title: "Zero-Overhead Schema Validation",
-      subtitle: "No manual parsing, compile-time safe",
-      description: "Declare request structures using standard Pydantic models. MicroJet validates incoming JSON objects, query strings, and headers, compiling assertions to optimized Python bytecode.",
+      id: "function-based",
+      tabLabel: "Function-Based",
+      title: "Routes Are Just Python Functions",
+      subtitle: "Pure functions, zero class boilerplate",
+      description: "Routes in Jet are simple Python functions. You pass function handlers directly to `app.route('/path', handler)` — no mandatory decorators or mandatory OOP class boilerplate required.",
       featuresList: [
-        "Inferred static typing directly from schemas",
-        "Ultra-fast custom deserialization compiled on launch",
-        "Support for standard Pydantic Field restrictions",
-        "Detailed, developer-friendly validation error payloads"
+        "Pass handler functions directly to app.route()",
+        "Clean, testable functions without decorator coupling",
+        "Easy composition and reusable request handlers",
+        "Explicit handler mapping for transparent application architecture"
       ],
-      codeSnippet: `from microjet import MicroJet
-from pydantic import BaseModel, Field
-from uuid import UUID
+      codeSnippet: `from jet import *
 
-app = MicroJet()
+app = Jet()
 
-class OrderSchema(BaseModel):
-    id: UUID
-    quantity: int = Field(..., gt=0)
-    notes: str | None = None
+def get_user_profile(request):
+    user_id = request.params.get("id")
+    return Response.json({"user_id": user_id, "status": "active"})
 
-# Input payload is fully validated before function execution
-@app.post("/api/orders", schema=OrderSchema)
-async def create_order(order: OrderSchema):
-    # order is parsed and typed fully
-    return {"success": True, "orderId": str(order.id)}`
+def update_settings(request):
+    payload = request.json()
+    return Response.json({"updated": True, "data": payload})
+
+# Explicit function-based routing
+app.route("/profile", get_user_profile)
+app.route("/settings", update_settings, methods=["POST"])`
     },
     {
-      id: "clustering",
-      tabLabel: "Dynamic Clustering",
-      title: "Automatic Multi-Process Scaling",
-      subtitle: "Saturate every thread effortlessly",
-      description: "Scale your Python APIs horizontally across all available hardware cores. MicroJet orchestrates native worker processes with zero-downtime hot-reloads and shared state synchronization.",
+      id: "config-driven",
+      tabLabel: "Configuration-Driven",
+      title: "Clean Separation of Concerns",
+      subtitle: "config.py and app.py stay separated",
+      description: "Jet follows one strict principle — configuration describes the application, application code describes application behavior. Keeping settings in `config.py` keeps codebase clean and modular.",
       featuresList: [
-        "Automatic core count detection with custom process caps",
-        "Shared state storage with atomic lock-free structures",
-        "Zero-downtime hot reload - swap logic without losing requests",
-        "Isolated error recovery - crashed worker processes reboot instantly"
+        "Separate configuration file config.py for environment settings",
+        "Decoupled application logic in app.py",
+        "Zero clutter from inline configuration constants",
+        "Seamless deployment tuning across environments"
       ],
-      codeSnippet: `from microjet import MicroJet
-app = MicroJet()
+      codeSnippet: `# config.py
+PORT = 3000
+DEBUG = True
+TEMPLATE_DIR = "templates"
+STATIC_DIR = "static"
 
-@app.get("/api/ping")
-async def ping():
-    return "pong"
+# app.py
+from jet import *
+import config
 
-# Deploy cluster mode with a single line of code
-app.run(
-    workers="auto", # Spawns process per CPU core
-    graceful_shutdown_ms=5000,
-    sync_state=True # Dynamic sync across worker processes
-)`
+app = Jet(config=config)
+
+def home(request):
+    return Response.html("<h1>Welcome to Jet</h1>")
+
+app.route("/", home)`
     },
     {
-      id: "footprint",
-      tabLabel: "Tiny Footprint",
-      title: "Extremely Lightweight Architecture",
-      subtitle: "Zero-dependency build packaged standalone",
-      description: "A framework engineered with strict architectural discipline. MicroJet features zero runtime dependencies outside standard library modules, providing high resilience and faster serverless cold-starts.",
+      id: "auto-docs",
+      tabLabel: "Auto Documentation",
+      title: "Automatic Swagger & OpenAPI",
+      subtitle: "/docs and /openapi.json out-of-the-box",
+      description: "Jet auto-mounts an interactive Swagger UI documentation interface at `/docs` and the full spec at `/openapi.json` — zero extra setup or boilerplate required.",
       featuresList: [
-        "Zero runtime external PIP dependencies required",
-        "Standalone pyinstaller deployment compatible",
-        "Cold starts of less than 2ms - optimized for Serverless / Cloud Run",
-        "Hardened security surface area - no supply chain leaks"
+        "Automatic OpenAPI spec generation at /openapi.json",
+        "Built-in Swagger UI documentation interface mounted at /docs",
+        "Zero configuration or third-party dependencies required",
+        "Live request testing interface for all routes"
       ],
-      codeSnippet: `# MicroJet relies purely on high-performance native Python C-extensions.
-# To run, package, and deploy, you only need main.py!
+      codeSnippet: `from jet import *
 
-from microjet import MicroJet
-app = MicroJet()
+app = Jet()
 
-@app.get("/")
-async def index():
-    return "Minimal. Mighty."
+def api_health(request):
+    return Response.json({"status": "ok", "version": "0.1"})
 
-app.run(port=3000)
+app.route("/api/health", api_health)
 
-# CLI Packager stats:
-# [Build] Compiling api/main.py...
-# [Build] Complete! Standalone executable: dist/api (8.4 MB)
-# [Build] Zero third-party packages needed in production.`
+# When you launch jet run:
+# -> /docs auto-mounted (Swagger UI)
+# -> /openapi.json auto-mounted`
     }
   ];
-
-  const gridFeatures: Feature[] = [
-    {
-      id: "ai-forward",
-      title: "AI-Forward Engineering",
-      description: "Built-in SDK adapters, telemetry hooks, and fast context optimization for Gemini models and automated AI API agents.",
-      icon: "Sparkles"
-    },
-    {
-      id: "opinionated",
-      title: "Opinionated & Versatile",
-      description: "Modular controller layers, dependency injection, and clean class decorators that structure simple microservices into robust enterprise backends.",
-      icon: "Layers"
-    },
-    {
-      id: "high-perf",
-      title: "High-Performance Core",
-      description: "Features a dedicated native serialization layer that benchmarks up to 5x faster than native JSON.stringify for large payload responses.",
-      icon: "Cpu"
-    },
-    {
-      id: "fully-featured",
-      title: "Production Ready Ecosystem",
-      description: "Equipped with first-party modules for CORS, body parsers, cookie encryption, helmet-inspired security headers, and rate limiting.",
-      icon: "Shield"
-    }
-  ];
-
-  // Render icon dynamically helper
-  const renderIcon = (iconName: string) => {
-    switch (iconName) {
-      case "Sparkles":
-        return <Sparkles className="w-5 h-5 text-blue-400" />;
-      case "Layers":
-        return <Layers className="w-5 h-5 text-blue-500" />;
-      case "Cpu":
-        return <Cpu className="w-5 h-5 text-indigo-400" />;
-      case "Shield":
-        return <Shield className="w-5 h-5 text-blue-400" />;
-      default:
-        return <Box className="w-5 h-5 text-slate-400" />;
-    }
-  };
 
   const currentTab = tabs.find((t) => t.id === activeTab) || tabs[0];
 
   return (
-    <section id="features" className="py-24 relative overflow-hidden bg-[#0b0f19]">
-      {/* Decorative Diagonal Slashes Mesh */}
-      <div className="absolute inset-0 slash-mesh-blue opacity-[0.15] pointer-events-none" />
-      <div className="absolute inset-0 slash-mesh-white opacity-[0.08] pointer-events-none" />
-
-      {/* Background decoration elements */}
-      <div className="absolute top-1/2 left-0 w-80 h-80 radial-glow-cyan rounded-full pointer-events-none filter blur-3xl opacity-30" />
-      <div className="absolute bottom-10 right-0 w-96 h-96 radial-glow rounded-full pointer-events-none filter blur-3xl opacity-20" />
-
+    <section id="features" className="py-24 relative overflow-hidden bg-[#080a0e] border-t border-slate-900/80">
+      <div className="absolute top-1/3 right-0 w-80 h-80 bg-yellow-500/5 rounded-full pointer-events-none filter blur-3xl" />
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* Section Title */}
-        <div className="text-center max-w-3xl mx-auto">
+        {/* Fumadocs Signature Big Statement Block */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="max-w-5xl mx-auto py-12 mb-16 text-left sm:text-center p-8 rounded-3xl bg-gradient-to-r from-yellow-500/5 via-transparent to-amber-500/5 border border-slate-800/60 backdrop-blur-md"
+        >
+          <p className="font-display text-2xl sm:text-3xl md:text-4xl text-slate-200 leading-[1.4] tracking-tight font-normal">
+            Jet is a <span className="text-yellow-400 font-bold drop-shadow-[0_0_12px_rgba(234,179,8,0.3)]">Python</span> web framework for <span className="text-yellow-400 font-bold drop-shadow-[0_0_12px_rgba(234,179,8,0.3)]">Developers</span>, beautifully designed by <span className="text-yellow-400 font-bold">Code Gear.</span> Bringing powerful routing for your web workflows, with high customizability to fit your preferences, works seamlessly with any deployment, ASGI — anything.
+          </p>
+        </motion.div>
+
+        {/* Section Heading */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mt-8"
+        >
+          <span className="text-xs font-mono font-semibold text-yellow-400 uppercase tracking-widest bg-yellow-500/10 border border-yellow-500/20 px-3.5 py-1.5 rounded-full inline-block mb-4 shadow-sm">
+            Core Principles
+          </span>
           <h2 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-white tracking-tight leading-tight">
-            Features that actually help you solve problems
+            Designed for Simplicity & Speed
           </h2>
           <p className="mt-4 text-slate-400 text-sm sm:text-base font-normal">
-            No fluff. Just pristine developer ergonomics, high performance structures, and extreme execution speed.
+            Jet avoids unnecessary magic. Every API is readable by beginners while remaining powerful enough to grow.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Tab Buttons bar - scrollable on mobile */}
+        {/* Tab Buttons */}
         <div className="mt-12 flex justify-start md:justify-center overflow-x-auto pb-4 gap-2 md:gap-3 no-scrollbar scroll-smooth">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-shrink-0 px-6 py-2.5 text-xs sm:text-sm font-semibold rounded-lg border transition-all cursor-pointer ${
-                activeTab === tab.id
-                  ? "bg-white border-white text-slate-950 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-                  : "bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-white hover:border-slate-700"
-              }`}
-              id={`tab-btn-${tab.id}`}
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-shrink-0 px-6 py-2.5 text-xs sm:text-sm font-semibold rounded-full transition-all cursor-pointer relative ${
+                  isActive
+                    ? "text-slate-950 font-bold shadow-lg shadow-yellow-500/20"
+                    : "bg-[#141824] border border-slate-800/80 text-slate-400 hover:text-white hover:border-slate-700"
+                }`}
+                id={`tab-btn-${tab.id}`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="active-feature-tab"
+                    className="absolute inset-0 bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-400 rounded-full"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.tabLabel}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content Panel with AnimatePresence */}
+        <div className="mt-10 min-h-[420px]" id="features-tab-content">
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={currentTab.id}
+              initial={{ opacity: 0, y: 15, scale: 0.99 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -15, scale: 0.99 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
             >
-              {tab.tabLabel}
-            </button>
-          ))}
+              {/* Detailed Description Panel */}
+              <div className="lg:col-span-5 flex flex-col justify-between bg-[#0e1118]/90 backdrop-blur-xl border border-slate-800/80 hover:border-slate-700 transition-all rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/10 rounded-full pointer-events-none filter blur-2xl opacity-40" />
+                
+                <div>
+                  <span className="text-xs font-mono font-semibold text-yellow-400 uppercase tracking-widest block mb-2">
+                    {currentTab.subtitle}
+                  </span>
+                  <h3 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
+                    {currentTab.title}
+                  </h3>
+                  <p className="mt-4 text-slate-300 font-normal text-sm sm:text-base leading-relaxed">
+                    {currentTab.description}
+                  </p>
+
+                  {/* Bullet checklist */}
+                  <ul className="mt-6 flex flex-col gap-3.5">
+                    {currentTab.featuresList.map((item, index) => (
+                      <motion.li 
+                        key={index} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.08 }}
+                        className="flex items-start gap-3"
+                      >
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mt-0.5">
+                          <Check className="w-3 h-3 text-yellow-400" />
+                        </span>
+                        <span className="text-slate-300 text-xs sm:text-sm">{item}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-slate-800/60 flex items-center gap-3 text-xs font-mono text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                  <span>Jet Framework Core Principle</span>
+                </div>
+              </div>
+
+              {/* Code Preview Box */}
+              <div className="lg:col-span-7 rounded-3xl bg-[#0a0d14] border border-slate-800/80 hover:border-slate-700/80 transition-all flex flex-col overflow-hidden shadow-2xl min-h-[350px]">
+                <div className="bg-[#0e1118] px-6 py-4 flex items-center justify-between border-b border-slate-800/80">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-1.5 mr-2">
+                      <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                      <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                      <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <Terminal className="w-4 h-4 text-yellow-400" />
+                    <span className="text-xs font-mono text-slate-300 font-medium">app.py</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-yellow-400/80 bg-yellow-500/10 px-2.5 py-1 rounded-full border border-yellow-500/20">Python 3</span>
+                </div>
+
+                <div className="flex-1 p-6 sm:p-7 overflow-x-auto font-mono text-xs sm:text-sm leading-relaxed text-slate-200 text-left bg-gradient-to-br from-[#0a0d14] to-[#07090f]">
+                  <pre>{currentTab.codeSnippet}</pre>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Tab Content Panel */}
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch" id="features-tab-content">
-          
-          {/* Detailed Description Panel */}
-          <div className="lg:col-span-5 flex flex-col justify-between bg-[#0f1423] border border-slate-800/80 rounded-xl p-6 sm:p-8 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 radial-glow-cyan rounded-full pointer-events-none filter blur-xl opacity-20" />
-            
-            <div>
-              <span className="text-xs font-mono font-semibold text-blue-400 uppercase tracking-widest block mb-2">
-                {currentTab.subtitle}
-              </span>
-              <h3 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
-                {currentTab.title}
-              </h3>
-              <p className="mt-4 text-slate-400 font-normal text-sm sm:text-base leading-relaxed">
-                {currentTab.description}
-              </p>
-
-              {/* Bullet checklist */}
-              <ul className="mt-6 flex flex-col gap-3.5">
-                {currentTab.featuresList.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-950/80 border border-blue-900/60 flex items-center justify-center mt-0.5">
-                      <Check className="w-3 h-3 text-blue-400" />
-                    </span>
-                    <span className="text-slate-300 text-xs sm:text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Quick performance indicator footer */}
-            <div className="mt-8 pt-6 border-t border-slate-800/60 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800/80 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Engine Metric</div>
-                <div className="text-[10px] font-mono text-slate-500 mt-0.5">Sub-millisecond routing traversal</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Code Snippet Box */}
-          <div className="lg:col-span-7 rounded-xl bg-slate-950 border border-slate-800/80 flex flex-col overflow-hidden shadow-xl min-h-[350px] lg:min-h-[450px]">
-            {/* Code Box Header */}
-            <div className="bg-[#0f1423] px-5 py-3.5 flex items-center justify-between border-b border-slate-800/80">
-              <div className="flex items-center gap-1.5">
-                <Terminal className="w-4 h-4 text-blue-400" />
-                <span className="text-xs font-mono text-slate-400 font-medium">main.py</span>
-              </div>
-              <div className="flex items-center gap-1 bg-slate-950 px-2.5 py-0.5 rounded text-[10px] font-mono text-slate-500 border border-slate-900">
-                Python / ASGI
-              </div>
-            </div>
-
-            {/* Code content block with light highlight logic */}
-            <div className="flex-1 p-5 sm:p-6 overflow-x-auto font-mono text-xs sm:text-sm leading-relaxed text-slate-300 text-left bg-slate-950/50">
-              <pre>{currentTab.codeSnippet}</pre>
-            </div>
-          </div>
-        </div>
-
-        {/* Dynamic features secondary grid: "Enabling you to build smarter and faster" */}
+        {/* Overview Feature Cards Grid */}
         <div className="mt-28">
-          <div className="text-center max-w-2xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-2xl mx-auto"
+          >
             <h3 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
-              Enabling you to build smarter and faster
+              What Jet Offers
             </h3>
             <p className="mt-3 text-slate-400 text-sm font-normal">
-              We did the heavy lifting so you can focus on building outstanding web API interfaces with Pydantic.
+              Everything you need to build web applications without clutter or unnecessary abstractions.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="features-grid">
-            {gridFeatures.map((feat) => (
-              <div
-                key={feat.id}
-                className="group relative rounded-xl bg-slate-900/10 border border-slate-800/60 p-6 backdrop-blur-sm hover:bg-slate-900/30 hover:border-slate-700/80 transition-all duration-300"
-                id={`feature-card-${feat.id}`}
-              >
-                <div className="w-10 h-10 rounded-lg bg-slate-950 border border-slate-800/80 flex items-center justify-center group-hover:border-blue-500/50 transition-colors">
-                  {renderIcon(feat.icon)}
-                </div>
-                <h4 className="mt-5 font-display font-semibold text-lg text-white group-hover:text-blue-300 transition-colors">
-                  {feat.title}
-                </h4>
-                <p className="mt-3 text-slate-400 text-xs sm:text-sm font-light leading-relaxed">
-                  {feat.description}
-                </p>
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <Layers className="w-5 h-5 text-yellow-400" />
               </div>
-            ))}
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">Routing and Pages</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Render template files with <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">app.page("/", "index.html")</code> or handle function endpoints with <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">app.route("/login", login)</code>.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+              </div>
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">Templates ({'<%jet %>'} Syntax)</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Clean and intuitive template rendering syntax powered by Jet's lightweight template parser engine.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <Terminal className="w-5 h-5 text-yellow-400" />
+              </div>
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">Request & Response Objects</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Structured <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">Response.html()</code>, <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">Response.json()</code>, and request inspection objects.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <Cpu className="w-5 h-5 text-yellow-400" />
+              </div>
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">Static Files and Uploads</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Out-of-the-box static asset serving from <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">static/</code> and multipart file upload handling.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <BookOpen className="w-5 h-5 text-yellow-400" />
+              </div>
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">Auto Documentation</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Automatically mounts <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">/docs</code> (Swagger UI) and <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">/openapi.json</code> without extra configuration.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              whileHover={{ y: -6, scale: 1.02 }}
+              className="p-6 rounded-3xl bg-[#0e1118]/80 backdrop-blur-xl border border-slate-800/80 hover:border-yellow-500/40 hover:shadow-[0_10px_30px_-10px_rgba(234,179,8,0.15)] transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/5 border border-yellow-500/30 text-yellow-400 flex items-center justify-center font-mono font-bold text-xs group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                <Shield className="w-5 h-5 text-yellow-400" />
+              </div>
+              <h4 className="mt-5 font-semibold text-white group-hover:text-yellow-300 transition-colors text-base">The jet CLI</h4>
+              <p className="mt-2.5 text-xs text-slate-400 leading-relaxed font-normal">
+                Run <code className="text-yellow-300 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800">jet run</code> to start the dev server with auto-reload, request logging, and a startup banner.
+              </p>
+            </motion.div>
+
           </div>
         </div>
 

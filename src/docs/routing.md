@@ -1,56 +1,72 @@
-# Routing & Path Traversals
+# Routing and Pages
 
-MicroJet uses an optimized, cache-aligned **Radix Tree** structure for path resolution. Instead of checking every route sequentially with regular expressions, it traverses a prefix tree of paths, resolving routes in $O(k)$ time.
+Routing in Jet is simple, explicit, and function-based.
 
 ---
 
-## Basic Routing
+## Function-Based Routes
 
-To declare routes, use the standard `@app.route` decorators or register sub-routers:
+In Jet, routes are just Python functions passed to `app.route()`:
 
 ```python
-from microjet import MicroJet
+from jet import *
 
-app = MicroJet()
+app = Jet()
 
-@app.get("/api/v1/health")
-async def health_check():
-    return {"status": "healthy"}
+def profile(request):
+    user_id = request.params.get("id")
+    return Response.json({"user_id": user_id, "status": "active"})
+
+app.route("/profile", profile)
+```
+
+No mandatory decorators or boilerplate classes required.
+
+---
+
+## Page Rendering
+
+Render HTML templates located in `templates/` using `app.page()`:
+
+```python
+app.page("/", "index.html")
+app.page("/about", "about.html")
 ```
 
 ---
 
-## Path Parameters
+## Templates (`<%jet %>` Syntax)
 
-Declare path variables with bracket notation. MicroJet automatically validates parameters against standard Python type hints:
+Templates in `templates/` support Jet's tag syntax:
 
-```python
-@app.get("/users/{user_id:int}")
-async def get_user(user_id: int):
-    return {"user_id": user_id, "scope": "standard"}
+```html
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Welcome</h1>
+    <%jet if request.user %>
+        <p>Hello <%jet request.user.name %></p>
+    <%jet endif %>
+</body>
+</html>
 ```
-
-Supported types include:
-- `int` (parses integer parameters)
-- `str` (parses plain string parameters)
-- `uuid` (parses standard UUID formats)
 
 ---
 
-## Nested Routers
+## Configuration-Driven Setup
 
-For larger microservices, structure your code with modular `Router` objects:
+Keep settings cleanly separated in `config.py`:
 
 ```python
-from microjet import Router
+# config.py
+PORT = 3000
+DEBUG = True
+```
 
-# Define user routes
-user_router = Router(prefix="/users")
+```python
+# app.py
+from jet import *
+import config
 
-@user_router.get("/{user_id:int}/profile")
-async def get_profile(user_id: int):
-    return {"user_id": user_id, "avatar": "default.png"}
-
-# Include into main app
-app.include_router(user_router)
+app = Jet(config=config)
 ```

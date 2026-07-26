@@ -1,57 +1,55 @@
 # Installation Guide
 
-Setting up MicroJet is quick and easy. This guide covers basic installation, compiling with binary extensions, and setting up your development environment.
+Installing Jet is simple and straightforward.
 
 ---
 
-## Prerequisites
+## Step-by-Step Installation
 
-- **Python**: v3.10, v3.11, or v3.12 (standard CPython or PyPy).
-- **Operating System**: Linux, macOS, or Windows (WSL2 recommended for optimal socket performance).
-
----
-
-## Basic Installation
-
-Install the core framework from PyPI:
+Clone the Jet repository from GitHub and install it in editable mode using `pip`:
 
 ```bash
-pip install microjet
+git clone https://github.com/CodeGear/jet.git
+cd jet
+pip install -e .
 ```
 
-To verify the installation was successful, run the CLI helper:
+This installs the `jet` command CLI locally on your machine.
+
+---
+
+## Verifying Installation
+
+Verify that the CLI command is available by running:
 
 ```bash
-microjet --version
+jet --version
 ```
 
 ---
 
-## Advanced Installation (Binary Compiler)
+## Running Your First App
 
-For extreme performance, you can compile request paths and schema validations directly to C-extensions on your machine using the optional compilation compiler:
+Create an `app.py` file with the following contents:
+
+```python
+from jet import *
+
+app = Jet()
+
+def home(request):
+    return Response.html("<h1>Hello from Jet!</h1>")
+
+app.route("/", home)
+
+if __name__ == "__main__":
+    serve(app)
+```
+
+Start the development server with auto-reload:
 
 ```bash
-pip install microjet[compiler]
+jet run
 ```
 
-This installs:
-- `uvloop` (for ultra-fast event loops on UNIX)
-- `orjson` (for high-speed JSON serialization)
-- `pydantic-core` native wrappers
-
----
-
-## Docker Deployment
-
-To build a production-ready container, use this optimized multi-stage `Dockerfile`:
-
-```dockerfile
-FROM python:3.11-slim as builder
-
-WORKDIR /app
-RUN pip install --no-cache-dir microjet[compiler]
-
-COPY . /app
-CMD ["microjet", "run", "main:app", "--host", "0.0.0.0", "--port", "3000"]
-```
+Visit `http://localhost:3000` to see your application, and `http://localhost:3000/docs` to view the auto-generated Swagger UI.

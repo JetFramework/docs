@@ -1,6 +1,6 @@
 {
-  "name": "MicroJet",
-  "description": "The high-performance, lightweight Python web API framework built for extreme speed and developer ergonomics.",
+  "name": "Jet Web Framework",
+  "description": "A lightweight, Python-first web framework developed by Code Gear.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

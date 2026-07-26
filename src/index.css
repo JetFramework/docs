@@ -12,8 +12,6 @@
   --font-display: "Anthropic Serif", sans-serif;
   --font-mono: "Anthropic Mono", monospace;
 
-
-  
   --color-brand-blue: #2563eb;
   --color-brand-cyan: #06b6d4;
   --color-dark-bg: #030712;
@@ -116,10 +114,85 @@
 }
 
 @keyframes pulse-subtle {
-  0%, 100% { opacity: 0.4; } /* এখানে কেটে যাওয়া অংশটি ঠিক করা হয়েছে */
+  0%, 100% { opacity: 0.4; }
   50% { opacity: 0.8; }
 }
 
 .animate-pulse-subtle {
   animation: pulse-subtle 4s ease-in-out infinite;
+}
+
+/* Fumadocs / Fuma Nama inspired grainy & warm gradient effects */
+.fuma-glow-top {
+  background: radial-gradient(circle at 75% 25%, rgba(234, 179, 8, 0.22) 0%, rgba(34, 197, 94, 0.15) 35%, rgba(249, 115, 22, 0.12) 60%, transparent 80%);
+}
+
+.fuma-glow-left {
+  background: radial-gradient(circle at 15% 85%, rgba(249, 115, 22, 0.25) 0%, rgba(234, 179, 8, 0.18) 45%, rgba(239, 68, 68, 0.1) 70%, transparent 90%);
+}
+
+.fuma-noise {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px), radial-gradient(rgba(234, 179, 8, 0.07) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}
+
+.fuma-grain-border {
+  background: linear-gradient(135deg, #eab308, #16a34a, #d97706, #0d9488);
+  background-size: 250% 250%;
+  animation: grain-shift 12s ease infinite;
+}
+
+@keyframes grain-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* New Gorgeous Glow & Transition Effects */
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-40px, 30px) scale(1.05); }
+  66% { transform: translate(30px, -30px) scale(0.9); }
+}
+
+.animate-orb-1 {
+  animation: orb-float-1 15s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+  animation: orb-float-2 18s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(234,179,8,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 4s infinite;
+}
+
+/* Glassmorphism card glow */
+.glass-card-glow {
+  background: rgba(15, 20, 35, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-glow:hover {
+  background: rgba(20, 26, 46, 0.8);
+  border-color: rgba(234, 179, 8, 0.35);
+  box-shadow: 0 10px 40px -10px rgba(234, 179, 8, 0.15), 0 0 20px -5px rgba(234, 179, 8, 0.1);
+  transform: translateY(-4px);
 }

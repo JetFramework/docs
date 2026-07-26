@@ -1,182 +1,223 @@
 import { useState, useEffect } from "react";
-import { Terminal, Menu, X, ArrowUpRight, Zap } from "lucide-react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Search, Menu, X, Github, ChevronDown, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
-interface NavbarProps {
-  onNavigate: (sectionId: string) => void;
-  activeSection: string;
-  currentView: "home" | "docs";
-  onViewChange: (view: "home" | "docs") => void;
-}
-
-export default function Navbar({ onNavigate, activeSection, currentView, onViewChange }: NavbarProps) {
+export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navItems = [
-    { label: "Features", id: "features" },
-    { label: "Interactive Tutorial", id: "sandbox" },
-    { label: "Benchmarks", id: "benchmarks" },
-    { label: "Documentation", id: "docs" },
+    { label: "Documentation", id: "docs", path: "/introduction" },
+    { label: "Features", id: "features", path: "/#features" },
+    { label: "Tutorial", id: "sandbox", path: "/#sandbox" },
+    { label: "Benchmarks", id: "benchmarks", path: "/#benchmarks" },
   ];
 
-  const handleNavItemClick = (id: string) => {
-    if (id === "docs") {
-      onViewChange("docs");
+  const handleNavItemClick = (item: { label: string; id: string; path: string }) => {
+    setIsMobileMenuOpen(false);
+    if (item.id === "docs") {
+      navigate("/introduction");
     } else {
-      if (currentView === "docs") {
-        onViewChange("home");
+      if (!isHomePage) {
+        navigate("/");
         setTimeout(() => {
-          onNavigate(id);
-        }, 80);
+          const el = document.getElementById(item.id);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 120);
       } else {
-        onNavigate(id);
+        const el = document.getElementById(item.id);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       }
     }
+  };
+
+  const handleLogoClick = () => {
     setIsMobileMenuOpen(false);
+    if (!isHomePage) {
+      navigate("/");
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-slate-950/80 backdrop-blur-md border-b border-slate-800/60 py-3 shadow-lg"
+          ? "bg-[#0b0f19]/85 backdrop-blur-xl border-b border-slate-800/80 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
           : "bg-transparent py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <div 
-          onClick={() => handleNavItemClick("hero")}
-          className="flex items-center gap-3 cursor-pointer group"
-          id="nav-logo"
-        >
-          <div className="relative w-9 h-9 flex items-center justify-center">
-            {/* Elegant shield-like gradient icon for MicroJet matching modern Angular.dev style exactly */}
-            <svg viewBox="0 0 100 100" className="w-9 h-9 text-pink-500 fill-none stroke-current transition-all duration-300 group-hover:scale-105">
-              <defs>
-                <linearGradient id="angularLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FF007A" />
-                  <stop offset="60%" stopColor="#8100E2" />
-                  <stop offset="100%" stopColor="#4A00E0" />
-                </linearGradient>
-              </defs>
-              <polygon points="50,5 92,23 92,72 50,95 8,72 8,23" fill="url(#angularLogoGrad)" stroke="none" />
-              {/* High fidelity white 'M' lines inside the angular style octagon */}
-              <path d="M 28,68 L 28,34 L 50,54 L 72,34 L 72,68" stroke="white" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
-            <div className="absolute inset-0 rounded-full bg-pink-500 opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300" />
-          </div>
-          <div>
-            <span className="font-display font-bold text-lg tracking-tight text-white group-hover:text-pink-400 transition-colors">
-              Micro<span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Jet</span>
+        {/* Left: Logo & Navigation Links */}
+        <div className="flex items-center gap-10">
+          <motion.div 
+            onClick={handleLogoClick}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="flex items-center gap-2.5 cursor-pointer group select-none relative"
+            id="nav-logo"
+          >
+            <div className="absolute -inset-1 rounded-full bg-yellow-500/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <img 
+              src="https://i.ibb.co/LDdqnb1L/6fb40491-3b3c-4c88-a692-e5231bd773e2-1.png" 
+              alt="Jet Logo" 
+              referrerPolicy="no-referrer"
+              className="w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)] relative z-10"
+            />
+            <span className="font-display font-bold text-lg sm:text-xl tracking-tight text-white group-hover:text-yellow-300 transition-colors relative z-10">
+              Jet
             </span>
-            <span className="block text-[8px] font-mono tracking-widest text-slate-500 uppercase leading-none mt-0.5">
-              python-v1.2.0
-            </span>
+          </motion.div>
+
+          {/* Desktop Nav Items */}
+          <div className="hidden md:flex items-center gap-6" onMouseLeave={() => setHoveredNav(null)}>
+            {navItems.map((item) => {
+              const isActive = item.id === "docs" ? !isHomePage : false;
+              const isHovered = hoveredNav === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavItemClick(item)}
+                  onMouseEnter={() => setHoveredNav(item.id)}
+                  className={`text-xs sm:text-sm transition-colors cursor-pointer relative py-1.5 px-1 ${
+                    isActive || isHovered
+                      ? "text-yellow-300 font-semibold"
+                      : "text-slate-300 hover:text-white"
+                  }`}
+                  id={`nav-item-${item.id}`}
+                >
+                  {item.label}
+                  {(isActive || isHovered) && (
+                    <motion.span
+                      layoutId="navbar-underline"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-yellow-400 to-amber-300 rounded-full shadow-[0_0_8px_rgba(234,179,8,0.5)]"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Desktop Nav Items */}
-        <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => {
-            const isActive = item.id === "docs" ? currentView === "docs" : (currentView === "home" && activeSection === item.id);
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavItemClick(item.id)}
-                className={`font-sans text-sm font-medium transition-colors cursor-pointer relative py-1 ${
-                  isActive
-                    ? "text-pink-400 font-semibold"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                id={`nav-item-${item.id}`}
-              >
-                {item.label}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500 rounded-full" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Action Button */}
+        {/* Right: Search & Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <button
-            onClick={() => handleNavItemClick("docs")}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-300 bg-slate-900/60 border border-slate-800/80 rounded-lg hover:bg-slate-800/80 hover:text-white transition-all cursor-pointer"
-            id="nav-docs-btn"
+          {/* Quick Search Pill */}
+          <motion.button
+            whileHover={{ scale: 1.03, borderColor: "rgba(234, 179, 8, 0.4)" }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/introduction")}
+            className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800/90 text-slate-400 hover:text-slate-200 text-xs transition-all cursor-pointer shadow-md group"
           >
-            <Terminal className="w-3.5 h-3.5 text-pink-400" />
-            Read Docs
-          </button>
-          <button
-            onClick={() => handleNavItemClick("sandbox")}
-            className="flex items-center gap-1 px-4.5 py-2 text-xs font-semibold text-slate-950 bg-white rounded-lg hover:bg-slate-100 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all cursor-pointer"
-            id="nav-get-started-btn"
+            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-yellow-400 transition-colors" />
+            <span>Search docs...</span>
+            <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-slate-950 border border-slate-800 rounded text-slate-500 group-hover:text-slate-300">
+              Ctrl K
+            </kbd>
+          </motion.button>
+
+          {/* GitHub Icon Link */}
+          <motion.a
+            whileHover={{ scale: 1.1, rotate: 6 }}
+            whileTap={{ scale: 0.9 }}
+            href="https://github.com/CodeGear/jet"
+            target="_blank"
+            rel="noreferrer"
+            className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-900/80 transition-all shadow-sm"
+            title="GitHub Repository"
           >
-            Get Started
-            <ArrowUpRight className="w-3.5 h-3.5 text-slate-950" />
-          </button>
+            <Github className="w-4.5 h-4.5" />
+          </motion.a>
+
+          {/* Version Selector Pill */}
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/30 text-[11px] font-mono text-yellow-300 select-none shadow-sm">
+            <Sparkles className="w-3 h-3 text-yellow-400 animate-pulse" />
+            <span>v0.1</span>
+            <ChevronDown className="w-3 h-3 text-yellow-400" />
+          </div>
         </div>
 
         {/* Mobile menu button */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none cursor-pointer"
-          aria-label="Toggle Menu"
-          id="mobile-menu-toggle"
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={() => navigate("/introduction")}
+            className="p-2 text-slate-400 hover:text-white rounded-lg"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none cursor-pointer"
+            aria-label="Toggle Menu"
+            id="mobile-menu-toggle"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6 text-yellow-400" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-slate-950 border-b border-slate-800 py-6 px-6 shadow-xl flex flex-col gap-5">
-          {navItems.map((item) => {
-            const isActive = item.id === "docs" ? currentView === "docs" : (currentView === "home" && activeSection === item.id);
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavItemClick(item.id)}
-                className={`text-left font-sans text-base font-medium py-2 border-b border-slate-900 ${
-                  isActive ? "text-pink-400 font-semibold" : "text-slate-400"
-                }`}
-                id={`mobile-nav-${item.id}`}
+      {/* Mobile Menu Dropdown with AnimatePresence */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-[#0b0f19]/95 backdrop-blur-2xl border-b border-slate-800 px-6 shadow-2xl"
+          >
+            <div className="py-6 flex flex-col gap-4">
+              {navItems.map((item, index) => (
+                <motion.button
+                  key={item.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handleNavItemClick(item)}
+                  className="text-left font-sans text-base font-medium py-2.5 border-b border-slate-900/80 text-slate-300 hover:text-yellow-400 hover:pl-2 transition-all flex items-center justify-between"
+                  id={`mobile-nav-${item.id}`}
+                >
+                  <span>{item.label}</span>
+                  <span className="text-yellow-500 text-xs font-mono">→</span>
+                </motion.button>
+              ))}
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-col gap-3 mt-4"
               >
-                {item.label}
-              </button>
-            );
-          })}
-          <div className="flex flex-col gap-3 mt-2">
-            <button
-              onClick={() => handleNavItemClick("docs")}
-              className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold text-white bg-slate-900 border border-slate-800 rounded-xl cursor-pointer"
-              id="mobile-nav-docs"
-            >
-              <Terminal className="w-4 h-4 text-pink-400" />
-              Read Docs
-            </button>
-            <button
-              onClick={() => handleNavItemClick("sandbox")}
-              className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold text-slate-950 bg-white rounded-xl cursor-pointer"
-              id="mobile-nav-start"
-            >
-              Get Started
-              <ArrowUpRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+                <a
+                  href="https://github.com/CodeGear/jet"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold text-slate-950 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-xl shadow-lg"
+                >
+                  <Github className="w-4 h-4 text-slate-950" />
+                  GitHub Repository
+                </a>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
+
